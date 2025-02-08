@@ -12,14 +12,14 @@ def query_upc(upc, data):
             packagings = []
             for packaging in product.get('packaging'):
                 packagings.append({"ndc": packaging.get("package_ndc"), "description": packaging.get("description")})
-            return {"generic_name": product.get("generic_name"), "expiry_date": product.get("listing_expiration_date"), "packaging": packagings}
+            return {"generic_name": product.get("generic_name"), "labeler_name": product.get("labeler_name"), "brand_name": product.get("brand_name"), "expiry_date": product.get("listing_expiration_date"), "packaging": packagings}
     return None
 
 def brute_ndc(ndc, data):
     for product in data:
         for packaging in product.get('packaging'):
             if ((len(packaging.get('package_ndc').replace('-','')) == 10) and packaging.get('package_ndc').replace('-','') in ndc):
-                return {"generic_name": product.get("generic_name"), "expiry_date": product.get("listing_expiration_date"), "ndc": packaging.get("package_ndc"), "description": packaging.get("description")}
+                return {"generic_name": product.get("generic_name"), "labeler_name": product.get("labeler_name"), "brand_name": product.get("brand_name"), "expiry_date": product.get("listing_expiration_date"), "ndc": packaging.get("package_ndc"), "description": packaging.get("description")}
     return None
 
 def decode_barcode(frame):
