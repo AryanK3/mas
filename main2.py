@@ -25,13 +25,19 @@ def brute_ndc(ndc, data):
 def decode_barcode(frame):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     barcodes = decode(gray)
-    
     for barcode in barcodes:
         barcode_data = barcode.data.decode('utf-8')
         print(f"Decoded barcode data: {barcode_data}")
         return barcode_data
 
     return None
+
+def save_record_to_file(product):
+    with open("saved_prods.json", "r+") as file:
+        file_data = json.load(file)
+        file_data.append(product)
+        file.seek(0)
+        json.dump(file_data, file, indent = 4)
 
 def main(db_path):
     data = load_products(db_path)
@@ -54,13 +60,20 @@ def main(db_path):
             product = brute_ndc(barcode_data, data)
             if product:
                 print(json.dumps(product, indent=4))
-                break
-
+                inp = input("Enter (y) to continue, (s) to save: ")
+                if inp.lower() == 'y':
+                    continue 
+                elif inp.lower() == 's':
+                    save_record_to_file(product)
+                    continue  
+                else:
+                    break
             product = query_upc(barcode_data, data)
             if product:
                 print(json.dumps(product, indent=4))
-                break
-
+                inp = input("Enter (y) to continue: ")
+                if inp.lower() != 'y':
+                    break
         cv2.imshow("Video Feed", frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
