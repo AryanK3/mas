@@ -32,12 +32,32 @@ def decode_barcode(frame):
 
     return None
 
+import json
+
 def save_record_to_file(product):
     with open("saved_prods.json", "r+") as file:
         file_data = json.load(file)
+
+        for prod in file_data:
+            if (len(prod.get('ndc').replace('-', '')) == 10 and prod.get('ndc').replace('-', '') == product.get('ndc').replace('-', '')):
+                prod['count'] += 1  
+                file.seek(0)
+                json.dump(file_data, file, indent=4)
+                print('Saved data')
+                return
+
+            elif ('upc' in product.get('upc', {}) and prod.get('upc') == product.get('upc')):
+                prod['count'] += 1
+                file.seek(0)
+                json.dump(file_data, file, indent=4)
+                print('Saved data')
+                return
+        
+        product['count'] = 1
         file_data.append(product)
         file.seek(0)
-        json.dump(file_data, file, indent = 4)
+        json.dump(file_data, file, indent=4)
+        print('Saved data')
 
 def main(db_path):
     data = load_products(db_path)
