@@ -1,0 +1,43 @@
+GUIDE FOR THE UI
+===============
+
+1. Setup 
+
+You must call pip install openpyxl for each time you run it on a new program.
+
+Next, ensure you have the correct libraries installed for the program, and the EXCEL file "medicine_data.xlsx" downloaded and placed in the same folder that this program file is located in.
+
+----------------
+
+2. References
+
+The EXCEL sheet has a variety of data entries:
+
+Fill Status: Set to TRUE if a medicine is entered in the system for that box, FALSE, if the box/item is empty.
+
+Box Number: Self explanatory (do NOT alter this column in the code whatsoever). 
+
+Current Stored Medicine: Name of the medicine currently stored in that item.
+
+Expiration Date: The expiration date (in format MMDDYYYY).
+
+Type: Type of medicine that is stored; currently four options: Pill, Cream/Ointment, Liquid, Other
+
+Description: Brief description of the medicine that is stored (what it's used for, etc.)
+
+As of right now, that's all I've put in. I plan on getting feedback from the Dr./other Pharmacists (such as Logan) on what else I should add or change to make it more user friendly and helpful to the pharmacy department.
+
+
+----------------
+
+Current Problems:
+
+- With storing the expiration date, I don't want it to be stored as a float, because then when you try to edit it, it like makes you re-enter that field too. However, right now, when it's set as an integer, I get an error of "Value 'xxxx' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.' I need to fix that.
+
+- In viewing the medicine, the description doesn't wrap, and it isn't fully visible. 
+
+- I also want to make it look less ugly and generally less messy.
+
+
+
+
