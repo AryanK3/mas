@@ -1,3 +1,4 @@
+from pylibdmtx.pylibdmtx import decode as decode_dm
 import cv2
 import json
 from pyzbar.pyzbar import decode
@@ -18,21 +19,27 @@ def query_upc(upc, data):
 def brute_ndc(ndc, data):
     for product in data:
         for packaging in product.get('packaging'):
-            if ((len(packaging.get('package_ndc').replace('-','')) == 10) and packaging.get('package_ndc').replace('-','') in ndc):
+            if (packaging.get('package_ndc').replace('-','') in ndc): 
                 return {"generic_name": product.get("generic_name"), "labeler_name": product.get("labeler_name"), "brand_name": product.get("brand_name"), "expiry_date": product.get("listing_expiration_date"), "ndc": packaging.get("package_ndc"), "description": packaging.get("description")}
     return None
 
-def decode_barcode(frame):
+def decode_data(frame):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     barcodes = decode(gray)
-    for barcode in barcodes:
-        barcode_data = barcode.data.decode('utf-8')
-        print(f"Decoded barcode data: {barcode_data}")
-        return barcode_data
-
+    if (barcodes):
+        for barcode in barcodes:
+            barcode_data = barcode.data.decode('utf-8')
+            print(f"Decoded barcode data: {barcode_data}")
+            return barcode_data
+    '''
+    dms = decode_dm(gray)
+    if (dms):
+        for datamatrix in dms:
+            dm_data = dm.data.decode('utf-8')
+            print(f"Decoded data matrix data: {dm_data}")
+            return dm_data
+    '''
     return None
-
-import json
 
 def save_record_to_file(product):
     with open("saved_prods.json", "r+") as file:
@@ -60,9 +67,9 @@ def save_record_to_file(product):
         print('Saved data')
 
 def main(db_path):
-    data = load_products(db_path)
+    prods = load_products(db_path)
     
-    cap = cv2.VideoCapture(0)  
+    cap = cv2.VideoCapture(0) 
     
     if not cap.isOpened():
         print("Error: Could not open camera.")
@@ -74,10 +81,10 @@ def main(db_path):
             print("Error: Failed to capture frame.")
             break
 
-        barcode_data = decode_barcode(frame)
+        data = decode_data(frame)
         
-        if barcode_data:
-            product = brute_ndc(barcode_data, data)
+        if (data):
+            product = brute_ndc(data, prods)
             if product:
                 print(json.dumps(product, indent=4))
                 inp = input("Enter (y) to continue, (s) to save: ")
@@ -88,12 +95,18 @@ def main(db_path):
                     continue  
                 else:
                     break
-            product = query_upc(barcode_data, data)
+            product = query_upc(data, prods)
             if product:
                 print(json.dumps(product, indent=4))
-                inp = input("Enter (y) to continue: ")
-                if inp.lower() != 'y':
+                inp = input("Enter (y) to continue, (s) to save: ")
+                if inp.lower() == 'y':
+                    continue
+                elif inp.lower() == 's':
+                    save_record_to_file(product)
+                    continue
+                else:
                     break
+
         cv2.imshow("Video Feed", frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

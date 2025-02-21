@@ -2,7 +2,7 @@ import cv2
 from pyzbar.pyzbar import decode
 import numpy as np
 
-image = cv2.imread('capture.jpg') 
+image = cv2.imread('thic.jpeg') 
 image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 barcodes = decode(image)
